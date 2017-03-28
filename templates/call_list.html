@@ -1,0 +1,184 @@
+{% extends "layout.html" %}
+{% block body %}
+
+
+	    <div class="main-panel">
+		<nav class="navbar navbar-default">
+	            <div class="container-fluid">
+					<div class="navbar-minimize">
+						<button id="minimizeSidebar" class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+					</div>
+	                <div class="navbar-header">
+	                    <button type="button" class="navbar-toggle">
+	                        <span class="sr-only">Toggle navigation</span>
+	                        <span class="icon-bar bar1"></span>
+	                        <span class="icon-bar bar2"></span>
+	                        <span class="icon-bar bar3"></span>
+	                    </button>
+	                    <a class="navbar-brand" href="#Dashboard">
+							Overview
+						</a>
+	                </div>
+	                <div class="collapse navbar-collapse">
+
+						<form class="navbar-form navbar-left navbar-search-form" role="search">
+	    					<div class="input-group">
+	    						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+	    						<input type="text" value="" class="form-control" placeholder="Search...">
+	    					</div>
+	    				</form>
+
+	                    <ul class="nav navbar-nav navbar-right">
+	                        <li>
+	                            <a href="#stats" class="dropdown-toggle btn-magnify" data-toggle="dropdown">
+	                                <i class="ti-panel"></i>
+									<p>Stats</p>
+	                            </a>
+	                        </li>
+	                        <li class="dropdown">
+	                            <a href="#notifications" class="dropdown-toggle btn-rotate" data-toggle="dropdown">
+	                                <i class="ti-bell"></i>
+	                                <span class="notification">0</span>
+									<p class="hidden-md hidden-lg">
+										Notifications
+										<b class="caret"></b>
+									</p>
+	                            </a>
+	                            <ul class="dropdown-menu">
+	                                <!--<li><a href="#not1">Notification 1</a></li>
+	                                <li><a href="#not2">Notification 2</a></li>
+	                                <li><a href="#not3">Notification 3</a></li>
+	                                <li><a href="#not4">Notification 4</a></li>
+	                                <li><a href="#another">Another notification</a></li>-->
+	                            </ul>
+	                        </li>
+							<li>
+	                            <a href="#settings" class="btn-rotate">
+									<i class="ti-settings"></i>
+									<p class="hidden-md hidden-lg">
+										Settings
+									</p>
+	                            </a>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </nav>
+
+	        <div class="content">
+	            <div class="container-fluid">
+	                <div class="row">
+	                    <div class="col-md-12">
+							<h4 class="title">List of recorded calls</h4>
+		                    <p class="category">
+		                    List of inbound and outbound calls ordered by dated and grouped by phone number. In the action section you can access the text transcript, listen to the audio file and success indicator for the call.
+		                    </p>
+		                    <br>
+
+	                        <div class="card">
+	                            <div class="content">
+	                                <div class="toolbar">
+	                                    <!--Here you can write extra buttons/actions for the toolbar-->
+	                                </div>
+                                    <div class="fresh-datatables">
+										<table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+										<thead>
+											<tr>
+												<th>Phone Number</th>
+												<th>Sales Rep </th>
+												<th>Sales Case</th>
+												<th>Duration</th>
+												<th>Date</th>
+												<th class="disabled-sorting">Actions</th>
+											</tr>
+										</thead>
+										<tfoot>
+											<tr>
+												<th>Phone Number</th>
+												<th>Sales Rep </th>
+												<th>Sales Case</th>
+												<th>Duration</th>
+												<th>Date</th>
+												<th>Actions</th>
+											</tr>
+										</tfoot>
+										<tbody>
+											<tr>
+												<td>+56 99 5476574</td>
+												<td>Nicole Manriquez</td>
+												<td>iPhone 6 Screen</td>
+												<td>01:13</td>
+												<td>2017/03/25 10:00:10</td>
+												<td>
+													<a href="#" class="btn btn-simple btn-info btn-icon like"><i class="ti-heart"></i></a>
+													<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
+													<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>
+												</td>
+											</tr>
+											<tr>
+												<td>+56 99 8765 4133</td>
+												<td>Nicole Manriquez</td>
+												<td>iPhone 6 Screen</td>
+												<td>00:20</td>
+												<td>2017/03/22 10:14:01</td>
+												<td>
+													<a href="#" class="btn btn-simple btn-info btn-icon like"><i class="ti-heart"></i></a>
+													<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
+													<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>
+												</td>
+											</tr>
+											
+										   </tbody>
+									    </table>
+									</div>
+
+
+	                            </div>
+	                        </div><!--  end card  -->
+	                    </div> <!-- end col-md-12 -->
+	                </div> <!-- end row -->
+	            </div>
+	        </div>
+
+
+	<script type="text/javascript">
+	    $(document).ready(function() {
+
+	        $('#datatables').DataTable({
+	            "pagingType": "full_numbers",
+	            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+	            responsive: true,
+	            language: {
+	            search: "_INPUT_",
+		            searchPlaceholder: "Search records",
+		        }
+	        });
+
+
+	        var table = $('#datatables').DataTable();
+	         // Edit record
+	         table.on( 'click', '.edit', function () {
+	            $tr = $(this).closest('tr');
+
+	            var data = table.row($tr).data();
+	            alert( 'You press on Row: ' + data[0] + ' ' + data[1] + ' ' + data[2] + '\'s row.' );
+	         } );
+
+	         // Delete a record
+	         table.on( 'click', '.remove', function (e) {
+	            $tr = $(this).closest('tr');
+	            table.row($tr).remove().draw();
+	            e.preventDefault();
+	         } );
+
+	        //Like record
+	        table.on( 'click', '.like', function () {
+	            alert('You clicked on Like button');
+	         });
+
+	    });
+	</script>
+
+
+	   
+{% endblock %}

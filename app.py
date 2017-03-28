@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
 
@@ -12,11 +11,22 @@ db = client.tododb
 
 
 @app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/call_list')
+def call_list():
+    return render_template('call_list.html')
+
+@app.route('/user')
+def user():
+    return render_template('user.html')
+
+@app.route('/todo')
 def todo():
 
     _items = db.tododb.find()
     items = [item for item in _items]
-
     return render_template('todo.html', items=items)
 
 
