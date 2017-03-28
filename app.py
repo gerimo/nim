@@ -12,23 +12,22 @@ db = client.tododb
 
 
 @app.route('/')
-def todo():
+def home():
+    return render_template('home.html')
 
+@app.route('/todo')
+def todo():
     _items = db.tododb.find()
     items = [item for item in _items]
-
     return render_template('todo.html', items=items)
-
 
 @app.route('/new', methods=['POST'])
 def new():
-
     item_doc = {
         'name': request.form['name'],
         'description': request.form['description']
     }
     db.tododb.insert_one(item_doc)
-
     return redirect(url_for('todo'))
 
 if __name__ == "__main__":
