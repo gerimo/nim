@@ -21,6 +21,10 @@ def user():
 def home():
     return render_template('index.html')
 
+@app.route('/landing')
+def landing():
+    return render_template('landing.html')
+
 @app.route('/todo')
 def todo():
     _items = db.tododb.find()
