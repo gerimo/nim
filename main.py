@@ -4,10 +4,8 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client = MongoClient(
-    'mongo',
-    27017)
-db = client.tododb
+client = MongoClient('mongo', 27017, connect=False)
+db = client.default
 
 @app.route('/call_list')
 def call_list():
@@ -27,7 +25,7 @@ def landing():
 
 @app.route('/todo')
 def todo():
-    _items = db.tododb.find()
+    _items = db.default.find()
     items = [item for item in _items]
     return render_template('todo.html', items=items)
 
@@ -37,8 +35,8 @@ def new():
         'name': request.form['name'],
         'description': request.form['description']
     }
-    db.tododb.insert_one(item_doc)
+    db.default.insert_one(item_doc)
     return redirect(url_for('todo'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', debug=True, port=80)

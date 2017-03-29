@@ -1,12 +1,12 @@
-FROM python:2.7.9
+FROM tiangolo/uwsgi-nginx-flask:flask
 
-ADD . /app
-WORKDIR /app
+COPY conf/upload_100m.conf /etc/nginx/conf.d/
+
+COPY ./requirements.txt /
 
 # Update pip
 RUN pip install --upgrade pip
 # Install requirements
-RUN pip install -r requirements.txt
+RUN pip install -r /requirements.txt
 
-EXPOSE 8080
-CMD ["python", "app.py"]
+ADD . /app
