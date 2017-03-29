@@ -20,7 +20,6 @@
 						</a>
 	                </div>
 	                <div class="collapse navbar-collapse">
-
 						<form class="navbar-form navbar-left navbar-search-form" role="search">
 	    					<div class="input-group">
 	    						<span class="input-group-addon"><i class="fa fa-search"></i></span>
@@ -69,11 +68,15 @@
 	            <div class="container-fluid">
 	                <div class="row">
 	                    <div class="col-md-12">
-							<h4 class="title">List of recorded calls</h4>
+							<h4 class="title">Upload and a new recorded calls</h4>
 		                    <p class="category">
-		                    List of inbound and outbound calls ordered by dated and grouped by phone number. In the action section you can access the text transcript, listen to the audio file and success indicator for the call.
-		                    </p>
-		                    <br>
+		                     Upload the each call manually. Please include in the name of the file, the customer's phone number and date with the format MM/DD/YY HH:MM:SS.
+		                     </p>
+		                    <form method=post enctype=multipart/form-data>
+      						<p><input type=file name=file> <input type=submit value=Upload Now>
+         					</p>
+    						</form>
+
 
 	                        <div class="card">
 	                            <div class="content">
