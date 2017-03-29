@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
 
@@ -10,10 +9,17 @@ client = MongoClient(
     27017)
 db = client.tododb
 
+@app.route('/call_list')
+def call_list():
+    return render_template('call_list.html')
+
+@app.route('/user')
+def user():
+    return render_template('user.html')
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('index.html')
 
 @app.route('/todo')
 def todo():
