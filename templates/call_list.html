@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 
+<!-- 
+para abrir un archivo pondríamos
+speech.flac
+href = '/uploads/speech.flac'
+-->
 
 	    <div class="main-panel">
 		<nav class="navbar navbar-default">
@@ -72,11 +77,19 @@
 		                    <p class="category">
 		                     Upload the each call manually. Please include in the name of the file, the customer's phone number and date with the format MM/DD/YY HH:MM:SS.
 		                     </p>
-		                    <form method=post enctype=multipart/form-data>
-      						<p><input type=file name=file> <input type=submit value=Upload Now>
-         					</p>
-    						</form>
 
+		                     <div class="col-md-offset-7">
+		                    	<form method=post enctype=multipart/form-data>
+      							<br>
+      							<div class="col-md-2">
+      							<input type=submit value=Upload Now>
+      							</div>
+      							<div class="col-md-2">
+      							<input type=file name=file>
+      							</div>
+         						</form>
+         						<br><br><br>
+	                    	</div>
 
 	                        <div class="card">
 	                            <div class="content">
@@ -87,54 +100,39 @@
 										<table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
 										<thead>
 											<tr>
-												<th>Phone Number</th>
+												<th>Call Data</th>
 												<th>Sales Rep </th>
 												<th>Sales Case</th>
-												<th>Duration</th>
-												<th>Date</th>
+												<th>Text Transcript</th>
 												<th class="disabled-sorting">Actions</th>
 											</tr>
 										</thead>
 										<tfoot>
+											 {% for file in files %}
+										<tbody>
 											<tr>
-												<th>Phone Number</th>
+												<td>{{ file }}</td>
+												<td>Nicole Manriquez</td>
+												<td>iPhone 6 Screen</td>
+												<td><a href="/transcripts/{{file}}"> Text transcript</td>
+												<td>
+													<a href="/uploads/{{file}}" class="btn btn-simple btn-info btn-icon like"><i class="ti-control-play"></i></a>
+													<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
+													<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>
+												</td>
+											</tr>
+											  {% endfor %}
+											  <tr>
+												<th>Call Data </th>
 												<th>Sales Rep </th>
 												<th>Sales Case</th>
-												<th>Duration</th>
-												<th>Date</th>
+												<th>View Transcript</th>
 												<th>Actions</th>
 											</tr>
 										</tfoot>
-										<tbody>
-											<tr>
-												<td>+56 99 5476574</td>
-												<td>Nicole Manriquez</td>
-												<td>iPhone 6 Screen</td>
-												<td>01:13</td>
-												<td>2017/03/25 10:00:10</td>
-												<td>
-													<a href="#" class="btn btn-simple btn-info btn-icon like"><i class="ti-heart"></i></a>
-													<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
-													<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>
-												</td>
-											</tr>
-											<tr>
-												<td>+56 99 8765 4133</td>
-												<td>Nicole Manriquez</td>
-												<td>iPhone 6 Screen</td>
-												<td>00:20</td>
-												<td>2017/03/22 10:14:01</td>
-												<td>
-													<a href="#" class="btn btn-simple btn-info btn-icon like"><i class="ti-heart"></i></a>
-													<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
-													<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>
-												</td>
-											</tr>
-											
 										   </tbody>
 									    </table>
 									</div>
-
 
 	                            </div>
 	                        </div><!--  end card  -->
