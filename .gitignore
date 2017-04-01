@@ -15,7 +15,7 @@
 .gopath/
 .go-pkg-cache/
 
-
+uploads
 speech/app/certs
 speech/app/certs/*
 speech/app/certs/*/*
