@@ -1,0 +1,6 @@
+====================
+tengo una bronca que si vienes y tránsito acerca de Perú
+0.612869501114
+====================
+tengo una bronca que si vienes y tránsito acerca del Perú
+None

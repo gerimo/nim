@@ -1,0 +1,65 @@
+====================
+Hola estaba hablando recién contigo
+0.773832499981
+====================
+Hola Estoy hablando recién contigo
+None
+====================
+ Exacto Quiero programar una visita mi casa para el día jueves
+0.641960024834
+====================
+ Exacto Quiero programar una visita mi casa de bateria el día jueves
+None
+====================
+ claro el próximo jueves En qué horario pero mira en la tarde como a las 5 la tarde para ello él hará en efectivo Se puede
+0.887495577335
+====================
+ claro el próximo jueves En qué horario pero mira en la tarde como a las 5 la tarde para ello Claro en efectivo Se puede
+None
+====================
+ día perfecto cuánto sale la batería para este celular de baterías l 39 900 y viene de regalo
+0.769718468189
+====================
+ día perfecto cuánto sale la batería para este celular la batería sale 39 900 y viene de regalo
+None
+====================
+ una amiga prefiere algo así o no suelo suelo 3434 la Florida 19 la Florida
+0.657499432564
+====================
+ una amiga prefiere algo así o no me suelo suelo 3434 la Florida 19 la Florida
+None
+====================
+ efectos
+None
+====================
+ exacto
+None
+====================
+ número de contacto de qué estamos hablando
+0.888297200203
+====================
+ número de contacto de que estamos hablando
+None
+====================
+ si mi nombre Angélica Pérez
+0.86708086729
+====================
+ Sí mi nombre Angélica Pérez
+None
+====================
+ a Freddy Freddy Freddy ya arroba gmail.com quiero mi confirmación con la hora y el nombre del técnico primer celular de mi hija cuando conectó el cargador no carga y no conecta pero no carga cierto conecta pero no carga el uno está en 1% todo el rato
+0.857696175575
+====================
+ a Freddy Freddy Freddy arroba gmail.com quiero mi confirmación con la hora y el nombre del técnico primer celular de mi hija cuando conectó el cargador no carga y no conecta pero no carga cierto conecta pero no carga el uno está en 1% todo el rato
+None
+====================
+ de garantía pero a cocinar tacos
+0.449095785618
+====================
+ de garantía Pero va a funcionar todo
+None
+====================
+ Dominic Entonces lo programamos para el jueves a las 5 de la tarde ya Angélica que estoy muy bien gracias a Dios
+0.787501037121
+====================
+ yo mi
