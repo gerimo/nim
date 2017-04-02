@@ -1,33 +1,29 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import time
 import io
 import os
-from flask.ext.pymongo import PyMongo
-mongo = PyMongo(app)
 
 # Imports the Google Cloud client library
 from google.cloud import speech
+hints = ['pantalla', 'iphone', '119', '69','bateria']
+client = speech.Client()
+sample = client.sample(source_uri='gs://neemfs/2.raw',
+                        encoding=speech.Encoding.LINEAR16,
+                        sample_rate=16000)
+operation = sample.async_recognize(language_code='es-CL',max_alternatives=2,speech_context=hints)
 
-# Instantiates a client
-speech_client = speech.Client()
+retry_count = 100
+while retry_count > 0 and not operation.complete:
+     retry_count -= 1
+     time.sleep(10)
+     operation.poll()  # API call
 
-# The name of the audio file to transcribe
-file_name = os.path.join(
-    os.path.dirname(__file__),
-    'speech',
-    'speech.flac')
+operation.complete
 
-# Loads the audio into memory
-with io.open(file_name, 'rb') as audio_file:
-    content = audio_file.read()
-    audio_sample = speech_client.sample(
-        content,
-        source_uri=None,
-        encoding='FLAC')
-
-# Detects speech in the audio file
-alternatives = speech_client.speech_api.sync_recognize(audio_sample,language_code='es-CL')
-
-for alternative in alternatives:
-    print('Transcript: {}'.format(alternative.transcript))
+for result in operation.results:
+    for alternative in result.alternatives:
+        print('=' * 20)
+        print(alternative.transcript)
+        print(alternative.confidence)
