@@ -14,13 +14,6 @@ UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = set(['pdf','mp3', 'mp3', '3ge', 'wev', 'flac', 'mov'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/papa')
-def papa():
-    total = len(os.listdir('./uploads'))
-    count = 0
-    files = os.listdir('./uploads')
-    return render_template('call_list.html') 
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -34,7 +27,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
 
 @app.route('/call_list', methods=['GET', 'POST'])
-
 def upload_file():
     total = len(os.listdir('./uploads'))
     count = 0
@@ -58,11 +50,6 @@ def upload_file():
             return redirect(url_for('uploaded_file',
                                     filename=filename))
     return render_template('call_list.html', count = count, total = total, files = files)
-
-# generate the transcript 
-@app.route('/nosetodavia')
-def convert():
-    print "convirtiendo el archivo"
 
 # retrieve the transcript
 @app.route('/uploads/<filename>')

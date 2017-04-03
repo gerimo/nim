@@ -6,19 +6,41 @@ from flask import Flask, redirect, url_for, request, render_template, send_from_
 from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
 
+
+# for google speech
+# play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
+from google.cloud import speech
+import time
+import io
+
+#!/usr/bin/python
+
+import boto
+import gcs_oauth2_boto_plugin
+import shutil
+import StringIO
+import tempfile
+
+# URI scheme for Cloud Storage.
+GOOGLE_STORAGE = 'gs'
+# URI scheme for accessing local files.
+LOCAL_FILE = 'file'
+
+
 #The DB connection will assume that the database has the same name as the Flask Appliction which is "app"
 app = Flask(__name__)
 mongo = PyMongo(app)
 
-UPLOAD_FOLDER = './uploads'
+UPLOAD_FOLDER = 'gs://neemfs/'
 ALLOWED_EXTENSIONS = set(['pdf','mp3', 'mp3', '3ge', 'wev', 'flac', 'mov'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/papa')
 def papa():
-    total = len(os.listdir('./uploads'))
+    from google.cloud import speech
+    total = len(os.listdir(UPLOAD_FOLDER))
     count = 0
-    files = os.listdir('./uploads')
+    files = os.listdir(UPLOAD_FOLDER)
     return render_template('call_list.html') 
 
 @app.route('/')
@@ -34,7 +56,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
 
 @app.route('/call_list', methods=['GET', 'POST'])
-
 def upload_file():
     total = len(os.listdir('./uploads'))
     count = 0
@@ -59,12 +80,7 @@ def upload_file():
                                     filename=filename))
     return render_template('call_list.html', count = count, total = total, files = files)
 
-# generate the transcript 
-@app.route('/nosetodavia')
-def convert():
-    print "convirtiendo el archivo"
-
-# retrieve the transcript
+# retrieve the audio
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
@@ -92,6 +108,37 @@ def user_profile():
     return render_template('user.html',
         user=user)
 
+# Grabacion del contenido del audio en la base de datos
+@app.route('/speech')
+def speech():
+    from google.cloud import speech
+    hints = ['pantalla', 'iphone', '119', '69','bateria']
+    client = speech.Client()
+    file_name = "[+56953645455]_[+56953645455]_[31-03-2017]_[14-30-46].raw"
+    sample = client.sample(source_uri='gs://neemfs/'+file_name,
+                        encoding=speech.Encoding.LINEAR16,
+                        sample_rate=8000)
+    operation = sample.async_recognize(language_code='es-CL',max_alternatives=2,speech_context=hints)
+    retry_count = 100
+    while retry_count > 0 and not operation.complete:
+        retry_count -= 1
+        time.sleep(10)
+        operation.poll()  # API call
+    operation.complete
+    for result in operation.results:
+        for alternative in result.alternatives:
+            print('=' * 20)
+            print(alternative.transcript)
+            print(alternative.confidence)
+            save = mongo.db.transcripts.insert({'file_name':file_name, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
+            transcript = mongo.db.transcripts.find({'file_name':file_name})
+    return render_template('transcript.html',
+        user=user, transcript=transcript)
+
+@app.route('/transcripts/<file_name>')
+def transcript(file_name):
+    transcript = mongo.db.transcripts.find({'file_name':file_name})
+    return render_template('transcript.html', transcript=transcript)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=1190, debug=True)
