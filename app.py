@@ -13,13 +13,23 @@ from google.cloud import speech
 import time
 import io
 
-#!/usr/bin/python
-
 import boto
 import gcs_oauth2_boto_plugin
 import shutil
 import StringIO
 import tempfile
+
+#./google-cloud-sdk/.install
+#./google-cloud-sdk/bin/gcloud init
+# gcloud auth login
+#!/usr/bin/python
+#for google storage
+#from gcs_oauth2_boto_plugin.oauth2_helper import SetFallbackClientIdAndSecret
+CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
+CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
+OAUTH2_CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
+OAUTH2_CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
+gcs_oauth2_boto_plugin.SetFallbackClientIdAndSecret(CLIENT_ID, CLIENT_SECRET)
 
 # URI scheme for Cloud Storage.
 GOOGLE_STORAGE = 'gs'
@@ -31,17 +41,9 @@ LOCAL_FILE = 'file'
 app = Flask(__name__)
 mongo = PyMongo(app)
 
-UPLOAD_FOLDER = 'gs://neemfs/'
-ALLOWED_EXTENSIONS = set(['pdf','mp3', 'mp3', '3ge', 'wev', 'flac', 'mov'])
+UPLOAD_FOLDER = './uploads' #'gs://neemfs/'
+ALLOWED_EXTENSIONS = set(['pdf','mp3', 'mp3', '3ge', 'wev', 'flac', 'mov', 'raw'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-@app.route('/papa')
-def papa():
-    from google.cloud import speech
-    total = len(os.listdir(UPLOAD_FOLDER))
-    count = 0
-    files = os.listdir(UPLOAD_FOLDER)
-    return render_template('call_list.html') 
 
 @app.route('/')
 def home():
@@ -76,8 +78,33 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
+            #return redirect(url_for('uploaded_file',filename=filename))
+            # Once the file has been stored in GS, we generate the transcript
+            from google.cloud import speech
+            hints = ['pantalla', 'iphone', '119', '69','bateria']
+            client = speech.Client()
+            file_name = "56995719043_56995719043_30-03-2017_14-31-19.raw"
+            sample = client.sample(source_uri='gs://neemfs/'+file_name,
+                        encoding=speech.Encoding.LINEAR16,
+                        sample_rate=8000)
+            operation = sample.async_recognize(language_code='es-CL',max_alternatives=2,speech_context=hints)
+            retry_count = 100
+            while retry_count > 0 and not operation.complete:
+                retry_count -= 1
+                time.sleep(10)
+                operation.poll()  # API call
+            operation.complete
+            for result in operation.results:
+                for alternative in result.alternatives:
+                    print('=' * 20)
+                    print(alternative.transcript)
+                    print(alternative.confidence)
+                    save = mongo.db.transcripts.insert({'file_name':file_name, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
+                    transcript = mongo.db.transcripts.find({'file_name':file_name})
+            return render_template('transcript.html',
+        user=user, transcript=transcript)   
+
+
     return render_template('call_list.html', count = count, total = total, files = files)
 
 # retrieve the audio
