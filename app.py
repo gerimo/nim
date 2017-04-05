@@ -1,3 +1,6 @@
+# to connect to the instance $ gcloud compute ssh neemfs
+# to initiate in productive $ sudo reboot / sudo service apache2 stop / sudo python app.py &
+
 import os
 import sys
 reload(sys)
@@ -9,12 +12,17 @@ from werkzeug.utils import secure_filename
 
 # for google speech
 # play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
+#in production install the following python google cloud version: pip install --upgrade google-cloud==0.22.0 --user
 from google.cloud import speech
 import time
 import io
+import sox
 
-import boto
-import gcs_oauth2_boto_plugin
+# for google cloud storage
+#https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/read-write-to-cloud-storage
+#https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/setting-up-cloud-storage
+#import gcs_oauth2_boto_plugin
+#import boto
 import shutil
 import StringIO
 import tempfile
@@ -29,20 +37,19 @@ CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleuserconten
 CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
 OAUTH2_CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
 OAUTH2_CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
-gcs_oauth2_boto_plugin.SetFallbackClientIdAndSecret(CLIENT_ID, CLIENT_SECRET)
+#gcs_oauth2_boto_plugin.SetFallbackClientIdAndSecret(CLIENT_ID, CLIENT_SECRET)
 
 # URI scheme for Cloud Storage.
 GOOGLE_STORAGE = 'gs'
 # URI scheme for accessing local files.
 LOCAL_FILE = 'file'
 
-
 #The DB connection will assume that the database has the same name as the Flask Appliction which is "app"
 app = Flask(__name__)
 mongo = PyMongo(app)
 
 UPLOAD_FOLDER = './uploads' #'gs://neemfs/'
-ALLOWED_EXTENSIONS = set(['pdf','mp3', 'mp3', '3ge', 'wev', 'flac', 'mov', 'raw'])
+ALLOWED_EXTENSIONS = set(['raw','flac','mp3','wav'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
@@ -78,7 +85,25 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_path_name, file_extension = os.path.splitext('./uploads/'+filename)
+            if file_extension != '.raw':
+                tfm = sox.Transformer()
+                tfm.build(app.config['UPLOAD_FOLDER']+'/'+filename, os.path.splitext(file_path_name)[0]+'.raw')
+                filename=os.path.splitext(filename)[0]+'.raw'#pero con raw
+            print filename 
+            print app.config['UPLOAD_FOLDER']
+            #Al archivo ya esta grabado en ./uploads        
             #return redirect(url_for('uploaded_file',filename=filename))
+            #file_path_name, file_extension = os.path.splitext(filename)
+            #if file.file_extension != '.raw'
+            #    tfm = sox.Transformer()
+            #    tfm.build(file_name+file_extension, file_name+'.raw')
+            #name = "[226612700]_[226612700]_[30-03-2017]_[16-48-00].flac"
+            #filename = "./uploads/"+name
+            #file_name, file_extension = os.path.splitext(filename)
+            
+
+
             # Once the file has been stored in GS, we generate the transcript
             from google.cloud import speech
             hints = ['pantalla', 'iphone', '119', '69','bateria']
@@ -118,15 +143,6 @@ def user():
     user = mongo.db.users.find_one_or_404({'name': "Phonaroid.com"})
     return render_template('user.html',
         user=user)
-
-@app.route('/new', methods=['POST'])
-def new():
-    item_doc = {
-        'name': request.form['name'],
-        'description': request.form['description']
-    }
-    db.tododb.insert_one(item_doc)
-    return redirect(url_for('todo'))
 
 # Para login de usuario
 @app.route('/username')
@@ -168,4 +184,4 @@ def transcript(file_name):
     return render_template('transcript.html', transcript=transcript)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=1190, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
