@@ -72,12 +72,13 @@
 	                    <div class="col-lg-4 col-md-5">
 	                        <div class="card card-user">
 	                            <div class="image">
-	                                <img src="assets/img/background.jpg" alt="..."/>
+	                                <!-- <img src="assets/img/background.jpg" alt="..."/> -->
 	                            </div>
 	                            <div class="content">
 	                                <div class="author"> 
-	                                  <img class="avatar border-white" src="assets/img/faces" alt="..."/>
-	                                  <h4 class="title">{{user}}<br />
+	                               <img class="avatar border-white" src={{ url_for('static', filename='img/pho.png') }} />
+
+	                                  <h4 class="title">{{user.name}}<br />
 	                                     <a href="#"><small>On Demand iPhone Repair Service</small></a>
 	                                  </h4>
 	                                </div>

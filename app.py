@@ -1,28 +1,43 @@
+#    To create a service account and have your application use it for API
+#    access, run:
+#        $ gcloud iam service-accounts create my-account
+#        $ gcloud iam service-accounts keys create key.json
+#          --iam-account=my-account@my-project.iam.gserviceaccount.com
+#        $ export GOOGLE_APPLICATION_CREDENTIALS=key.json
+#        $ ./my_application.sh
+
+#    To temporarily use your own user credentials, run:
+#        $ gcloud auth application-default login
+
+
 # to connect to the instance $ gcloud compute ssh neemfs
 # to initiate in productive $ sudo reboot / sudo service apache2 stop / sudo python app.py &
+# before deploying to the server read this: https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances
 
 import os
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask import Flask, redirect, url_for, request, render_template, send_from_directory
+# if you are using G Cloud remember to $ cp /etc/mongodb.conf /etc/mongod.conf
 from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
 
 
 # for google speech
 # play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
-#in production install the following python google cloud version: pip install --upgrade google-cloud==0.22.0 --user
+#in production install the following python google cloud version: pip install --upgrade google-cloud==0.24.0 --user
 from google.cloud import speech
 import time
 import io
+#install sox using apt-get install sox and pip install sox --user
 import sox
 
 # for google cloud storage
 #https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/read-write-to-cloud-storage
 #https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/setting-up-cloud-storage
-#import gcs_oauth2_boto_plugin
-#import boto
+import gcs_oauth2_boto_plugin
+import boto
 import shutil
 import StringIO
 import tempfile
@@ -32,7 +47,7 @@ import tempfile
 # gcloud auth login
 #!/usr/bin/python
 #for google storage
-#from gcs_oauth2_boto_plugin.oauth2_helper import SetFallbackClientIdAndSecret
+from gcs_oauth2_boto_plugin.oauth2_helper import SetFallbackClientIdAndSecret
 CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
 CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
 OAUTH2_CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
@@ -151,7 +166,7 @@ def user_profile():
     return render_template('user.html',
         user=user)
 
-# Grabacion del contenido del audio en la base de datos
+# Code for testing google speech transcripts
 @app.route('/speech')
 def speech():
     from google.cloud import speech
@@ -178,6 +193,45 @@ def speech():
     return render_template('transcript.html',
         user=user, transcript=transcript)
 
+# Code for file uploads to google storage
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
+
+@app.route('/up', methods=['GET', 'POST'])
+def up():
+    UPLOAD_FOLDER = 'gs://neemfs/' #'gs://neemfs/'
+    ALLOWED_EXTENSIONS = set(['raw','flac','mp3','wav'])
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    files = os.listdir('./uploads')
+    # upload a new file to the view
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_path_name, file_extension = os.path.splitext('./uploads/'+filename)
+            if file_extension != '.raw':
+                tfm = sox.Transformer()
+                tfm.build(app.config['UPLOAD_FOLDER']+'/'+filename, os.path.splitext(file_path_name)[0]+'.raw')
+                filename=os.path.splitext(filename)[0]+'.raw'#pero con raw
+            print filename 
+            print app.config['UPLOAD_FOLDER']
+            #Al archivo ya esta grabado en ./uploads        
+            #return redirect(url_for('uploaded_file',filename=filename))
+
+
+
 @app.route('/transcripts/<file_name>')
 def transcript(file_name):
     transcript = mongo.db.transcripts.find({'file_name':file_name})
@@ -185,3 +239,8 @@ def transcript(file_name):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
+
+
+#sudo gcloud auth login
+#to copy the ssh keys gcloud compute copy-files ~/.ssh/neem.json neemfs:~/.ssh/neem.json --zone asia-east1-a
+#mongo fast commenads / mongo / use app / db.users.find()

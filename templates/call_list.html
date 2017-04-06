@@ -78,13 +78,13 @@ href = '/uploads/speech.flac'
 		                     Upload the each call manually. Please include in the name of the file, the customer's phone number and date with the format MM/DD/YY HH:MM:SS.
 		                     </p>
 
-		                     <div class="col-md-offset-7">
+		                     <div class="col-md-offset-6">
 		                    	<form method=post enctype=multipart/form-data>
       							<br>
-      							<div class="col-md-2">
-      							<input type=submit value=Upload and Transcript Now>
+      							<div class="col-md-3">
+      							<input type=submit value="Upload and Transcript" >
       							</div>
-      							<div class="col-md-2">
+      							<div class="col-md-offset-1 col-md-2">
       							<input type=file name=file>
       							</div>
          						</form>
@@ -108,20 +108,24 @@ href = '/uploads/speech.flac'
 											</tr>
 										</thead>
 										<tfoot>
-											 {% for file in files %}
+											
+										{% for file in files if file.rsplit('.',1)[1] != 'raw' %}
+
 										<tbody>
 											<tr>
 												<td>{{ file }}</td>
 												<td>Nicole Manriquez</td>
 												<td>iPhone 6 Screen</td>
-												<td><a href={{"transcripts/" + file}} > Text transcript</td>
+												<td><a href={{"transcripts/" + file.rsplit('.',1)[0]+'.raw'}} > Text transcript</td>
 												<td>
 													<a href="/uploads/{{file}}" class="btn btn-simple btn-info btn-icon like"><i class="ti-control-play"></i></a>
-													<a href="" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
+													<a href=""transcripts/" + file.rsplit('.',1)[0]+'.raw'" class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pencil-alt"></i></a>
 													<!--<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="ti-close"></i></a>-->
 												</td>
 											</tr>
-											  {% endfor %}
+
+										{% endfor %}
+											  
 											  <tr>
 												<th>Call Data </th>
 												<th>Sales Rep </th>
