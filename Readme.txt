@@ -16,8 +16,6 @@
 # to initiate in productive $ sudo reboot / sudo service apache2 stop / sudo python app.py &
 # to connect to gcloud and run gsutil: sudo gcloud auth login
 
-
-
 Opcion 1
 # for google cloud storage
 #set the google storage bucket to be accesible $ gsutil defacl set public-read gs://neemfs

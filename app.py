@@ -13,13 +13,13 @@ import io
 #install sox using apt-get install sox and pip install sox --user and test the result # play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
 import sox
 
-# Authentification for Google Speech
+# Authentification for Google Speech $ --upgrade google-cloud-speech
 from google.cloud import speech
 
 #The DB connection will assume that the database has the same name as the Flask Appliction which is "app"
 app = Flask(__name__)
 mongo = PyMongo(app)
-UPLOAD_FOLDER = './uploads' #'gs://neemfs/'
+UPLOAD_FOLDER = os.getcwd()+'/uploads' #'gs://neemfs/'
 ALLOWED_EXTENSIONS = set(['raw','flac','mp3','wav'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # URI scheme for Cloud Storage.
