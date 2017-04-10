@@ -68,15 +68,30 @@
 
 <br>
 
-File Name: {{ transcript[0].filename }}
-
-{% for record in transcript %}											
-
-Transcription: {{ record.content.text }} <br>
-Confidence: {{ record.content.confidence }} <br>
-
-{% endfor %}
-
 <br> <br>
-	   
+	
+	<div class="container-fluid">
+	                <div class="row">
+	                    <div class="col-md-12">
+							<h4 class="title">Upload and a new recorded calls</h4>
+		                    <p class="category">
+		                     Upload the each call manually. Please include in the name of the file, the customer's phone number and date with the format MM/DD/YY HH:MM:SS.
+		                     </p>
+
+		                     <div class="col-md-offset-6">
+		                    	<form method=post enctype=multipart/form-data>
+      							<br>
+      							<div class="col-md-3">
+      							<input type=submit value="Upload and Transcript" >
+      							</div>
+      							<div class="col-md-offset-1 col-md-2">
+      							<input type=file name=file>
+      							</div>
+         						</form>
+         						<br><br><br>
+	                    	</div>
+	                    </div>
+	                </div>
+	<div> 
+	     
 {% endblock %}

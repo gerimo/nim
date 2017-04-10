@@ -1,19 +1,3 @@
-#    To create a service account and have your application use it for API
-#    access, run:
-#        $ gcloud iam service-accounts create my-account
-#        $ gcloud iam service-accounts keys create key.json
-#          --iam-account=my-account@my-project.iam.gserviceaccount.com
-#        $ export GOOGLE_APPLICATION_CREDENTIALS=key.json
-#        $ ./my_application.sh
-
-#    To temporarily use your own user credentials, run:
-#        $ gcloud auth application-default login
-
-
-# to connect to the instance $ gcloud compute ssh neemfs
-# to initiate in productive $ sudo reboot / sudo service apache2 stop / sudo python app.py &
-# before deploying to the server read this: https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances
-
 import os
 import sys
 reload(sys)
@@ -23,49 +7,25 @@ from flask import Flask, redirect, url_for, request, render_template, send_from_
 from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
 
-
-# for google speech
-# play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
-#in production install the following python google cloud version: pip install --upgrade google-cloud==0.24.0 --user
-from google.cloud import speech
+# for google speech pip install --upgrade google-cloud==0.24.0 --user, please note that the application is unstable if you use 0.25 or higher you should rewrite the application with the following examples https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/cloud-client/transcribe_async.py
 import time
 import io
-#install sox using apt-get install sox and pip install sox --user
+#install sox using apt-get install sox and pip install sox --user and test the result # play -r 8000 -b 16 -c 1 -e signed [226612700]_[226612700]_[30-03-2017]_[16-48-00].raw
 import sox
 
-# for google cloud storage
-#https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/read-write-to-cloud-storage
-#https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/setting-up-cloud-storage
-import gcs_oauth2_boto_plugin
-import boto
-import shutil
-import StringIO
-import tempfile
-
-#./google-cloud-sdk/.install
-#./google-cloud-sdk/bin/gcloud init
-# gcloud auth login
-#!/usr/bin/python
-#for google storage
-from gcs_oauth2_boto_plugin.oauth2_helper import SetFallbackClientIdAndSecret
-CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
-CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
-OAUTH2_CLIENT_ID = '455316581334-irn49vs4uscp0tj4q7pb80dc79i11o4k.apps.googleusercontent.com'
-OAUTH2_CLIENT_SECRET = 'rs7wVFzTSFbgmuM0ZFMjdWh5'
-#gcs_oauth2_boto_plugin.SetFallbackClientIdAndSecret(CLIENT_ID, CLIENT_SECRET)
-
-# URI scheme for Cloud Storage.
-GOOGLE_STORAGE = 'gs'
-# URI scheme for accessing local files.
-LOCAL_FILE = 'file'
+# Authentification for Google Speech
+from google.cloud import speech
 
 #The DB connection will assume that the database has the same name as the Flask Appliction which is "app"
 app = Flask(__name__)
 mongo = PyMongo(app)
-
 UPLOAD_FOLDER = './uploads' #'gs://neemfs/'
 ALLOWED_EXTENSIONS = set(['raw','flac','mp3','wav'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# URI scheme for Cloud Storage.
+GOOGLE_STORAGE = 'gs'
+# URI scheme for accessing local files.
+LOCAL_FILE = 'file'
 
 @app.route('/')
 def home():
@@ -81,10 +41,8 @@ def allowed_file(filename):
 
 @app.route('/call_list', methods=['GET', 'POST'])
 def upload_file():
-    total = len(os.listdir('./uploads'))
-    count = 0
-    # generate list of available files already uploaded, to display on the view
-    files = os.listdir('./uploads')
+    gs = "gs://neem-fs.appspot.com/"
+    files = os.listdir(UPLOAD_FOLDER)
     # upload a new file to the view
     if request.method == 'POST':
         # check if the post request has the file part
@@ -104,30 +62,18 @@ def upload_file():
             if file_extension != '.raw':
                 tfm = sox.Transformer()
                 tfm.build(app.config['UPLOAD_FOLDER']+'/'+filename, os.path.splitext(file_path_name)[0]+'.raw')
-                filename=os.path.splitext(filename)[0]+'.raw'#pero con raw
+                filename=os.path.splitext(filename)[0]+'.raw'
+                os.system("gsutil cp ./uploads/"+filename+" "+gs+filename)
+                print "does it?"
+            #upload the file to gs    
             print filename 
             print app.config['UPLOAD_FOLDER']
-            #Al archivo ya esta grabado en ./uploads        
-            #return redirect(url_for('uploaded_file',filename=filename))
-            #file_path_name, file_extension = os.path.splitext(filename)
-            #if file.file_extension != '.raw'
-            #    tfm = sox.Transformer()
-            #    tfm.build(file_name+file_extension, file_name+'.raw')
-            #name = "[226612700]_[226612700]_[30-03-2017]_[16-48-00].flac"
-            #filename = "./uploads/"+name
-            #file_name, file_extension = os.path.splitext(filename)
-            
-
-
             # Once the file has been stored in GS, we generate the transcript
             from google.cloud import speech
-            hints = ['pantalla', 'iphone', '119', '69','bateria']
             client = speech.Client()
-            file_name = "56995719043_56995719043_30-03-2017_14-31-19.raw"
-            sample = client.sample(source_uri='gs://neemfs/'+file_name,
-                        encoding=speech.Encoding.LINEAR16,
-                        sample_rate=8000)
-            operation = sample.async_recognize(language_code='es-CL',max_alternatives=2,speech_context=hints)
+            hints = ['pantalla', 'iphone', '119', '69','bateria']
+            sample = client.sample(content=None,source_uri=gs+filename,encoding='LINEAR16',sample_rate_hertz=8000)
+            operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=2, speech_contexts=hints)
             retry_count = 100
             while retry_count > 0 and not operation.complete:
                 retry_count -= 1
@@ -139,14 +85,11 @@ def upload_file():
                     print('=' * 20)
                     print(alternative.transcript)
                     print(alternative.confidence)
-                    save = mongo.db.transcripts.insert({'file_name':file_name, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
-                    transcript = mongo.db.transcripts.find({'file_name':file_name})
-            return render_template('transcript.html',
-        user=user, transcript=transcript)   
-
-
-    return render_template('call_list.html', count = count, total = total, files = files)
-
+                    save = mongo.db.transcripts.insert({'filename':filename, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
+                    transcript = mongo.db.transcripts.find({'filename':filename})
+            return render_template('transcript.html',user=user, transcript=transcript) 
+    return render_template('call_list.html', files=files)
+            
 # retrieve the audio
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -169,14 +112,12 @@ def user_profile():
 # Code for testing google speech transcripts
 @app.route('/speech')
 def speech():
+    hints = ['pantalla', 'iphone', '119', '69','bateria','Transbank']
     from google.cloud import speech
-    hints = ['pantalla', 'iphone', '119', '69','bateria']
     client = speech.Client()
-    file_name = "[+56953645455]_[+56953645455]_[31-03-2017]_[14-30-46].raw"
-    sample = client.sample(source_uri='gs://neemfs/'+file_name,
-                        encoding=speech.Encoding.LINEAR16,
-                        sample_rate=8000)
-    operation = sample.async_recognize(language_code='es-CL',max_alternatives=2,speech_context=hints)
+    file_name = "gs://neemfs/[+56953645455]_[+56953645455]_[31-03-2017]_[14-30-46].raw"
+    sample = client.sample(content=None,source_uri=file_name,encoding='LINEAR16',sample_rate_hertz=8000)
+    operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=2, speech_contexts=hints)
     retry_count = 100
     while retry_count > 0 and not operation.complete:
         retry_count -= 1
@@ -193,44 +134,9 @@ def speech():
     return render_template('transcript.html',
         user=user, transcript=transcript)
 
-# Code for file uploads to google storage
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
-
-@app.route('/up', methods=['GET', 'POST'])
-def up():
-    UPLOAD_FOLDER = 'gs://neemfs/' #'gs://neemfs/'
-    ALLOWED_EXTENSIONS = set(['raw','flac','mp3','wav'])
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    files = os.listdir('./uploads')
-    # upload a new file to the view
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            file_path_name, file_extension = os.path.splitext('./uploads/'+filename)
-            if file_extension != '.raw':
-                tfm = sox.Transformer()
-                tfm.build(app.config['UPLOAD_FOLDER']+'/'+filename, os.path.splitext(file_path_name)[0]+'.raw')
-                filename=os.path.splitext(filename)[0]+'.raw'#pero con raw
-            print filename 
-            print app.config['UPLOAD_FOLDER']
-            #Al archivo ya esta grabado en ./uploads        
-            #return redirect(url_for('uploaded_file',filename=filename))
-
-
 
 @app.route('/transcripts/<file_name>')
 def transcript(file_name):
@@ -240,7 +146,5 @@ def transcript(file_name):
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
 
-
-#sudo gcloud auth login
 #to copy the ssh keys gcloud compute copy-files ~/.ssh/neem.json neemfs:~/.ssh/neem.json --zone asia-east1-a
 #mongo fast commenads / mongo / use app / db.users.find()
