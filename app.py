@@ -109,38 +109,13 @@ def user_profile():
     return render_template('user.html',
         user=user)
 
-# Code for testing google speech transcripts
-@app.route('/speech')
-def speech():
-    hints = ['pantalla', 'iphone', '119', '69','bateria','Transbank']
-    from google.cloud import speech
-    client = speech.Client()
-    file_name = "gs://neemfs/[+56953645455]_[+56953645455]_[31-03-2017]_[14-30-46].raw"
-    sample = client.sample(content=None,source_uri=file_name,encoding='LINEAR16',sample_rate_hertz=8000)
-    operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=2, speech_contexts=hints)
-    retry_count = 100
-    while retry_count > 0 and not operation.complete:
-        retry_count -= 1
-        time.sleep(10)
-        operation.poll()  # API call
-    operation.complete
-    for result in operation.results:
-        for alternative in result.alternatives:
-            print('=' * 20)
-            print(alternative.transcript)
-            print(alternative.confidence)
-            save = mongo.db.transcripts.insert({'file_name':file_name, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
-            transcript = mongo.db.transcripts.find({'file_name':file_name})
-    return render_template('transcript.html',
-        user=user, transcript=transcript)
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
 
-@app.route('/transcripts/<file_name>')
-def transcript(file_name):
-    transcript = mongo.db.transcripts.find({'file_name':file_name})
+@app.route('/transcripts/<filename>')
+def transcript(filename):
+    transcript = mongo.db.transcripts.find({'filename':filename})
     return render_template('transcript.html', transcript=transcript)
 
 if __name__ == "__main__":

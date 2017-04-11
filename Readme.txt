@@ -8,7 +8,7 @@
 #    To temporarily use your own user credentials, run:
 #2. Install Google Cloud SDK / curl https://sdk.cloud.google.com | bash / exec -l $SHELL / gcloud init
 #3. in production install the following python google cloud version: pip install --upgrade google-cloud==0.24.0 --user
-#5. pip install gcloud pytho library $ pip install --upgrade google-api-python-client
+#5. pip install gcloud python library $ pip install --upgrade google-api-python-client
 #4  pip install --upgrade google-cloud-speech or pip install --upgrade google-cloud-speech==0.25.0 --user
 #6. gcloud beta auth application-default login or gcloud auth application-default login / gcloud components update
 #7. Generate an app.yaml config file https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server#Python_Running_the_development_web_server
