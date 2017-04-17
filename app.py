@@ -6,6 +6,7 @@ from flask import Flask, redirect, url_for, request, render_template, send_from_
 # if you are using G Cloud remember to $ cp /etc/mongodb.conf /etc/mongod.conf
 from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
+from BeautifulSoup import BeautifulSoup
 
 # for google speech pip install --upgrade google-cloud==0.24.0 --user, please note that the application is unstable if you use 0.25 or higher you should rewrite the application with the following examples https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/cloud-client/transcribe_async.py
 import time
@@ -85,7 +86,9 @@ def upload_file():
                     print('=' * 20)
                     print(alternative.transcript)
                     print(alternative.confidence)
-                    save = mongo.db.transcripts.insert({'filename':filename, 'content': {'text':alternative.transcript, 'confidence':alternative.confidence}})
+                    save = mongo.db.transcripts.insert({'filename':filename, 
+                        'content': {'text':alternative.transcript, 'confidence':alternative.confidence,
+                        'verified':0}})
                     transcript = mongo.db.transcripts.find({'filename':filename})
             return render_template('transcript.html',user=user, transcript=transcript) 
     return render_template('call_list.html', files=files)
@@ -115,11 +118,52 @@ def allowed_file(filename):
 
 @app.route('/transcripts/<filename>')
 def transcript(filename):
-    transcript = mongo.db.transcripts.find({'filename':filename})
+    transcript = mongo.db.transcripts.find({'filename':filename}) 
     return render_template('transcript.html', transcript=transcript)
+
+@app.route('/case/create', methods=['GET', 'POST'])
+def case():
+    if request.method == 'POST':   
+       # save = mongo.db.cases.insert({'name':request.form['name'], 
+       #                 'keywords': {'identify': request.form['identify'], 'successful': request.form['successful'],  
+       #                 'mistaken': request.form['mistaken']}
+       #                 })
+        save = mongo.db.cases.insert({'name':request.form.get('name'), 
+                        'keywords': {'identify': request.form.get('identify'), 'successful': request.form.get('successful'),  
+                        'mistaken': request.form.get('mistaken')}
+                        })
+        #case = mongo.db.cases.find({'name':name}) 
+        return """render_template('create_success.html', case=case)"""
+    return render_template('create_case.html')
+
+@app.route('/sip')
+def sip():
+    transcript = mongo.db.transcripts.find({'filename':'56999975603_56999975603_12-04-2017_14-27-15.raw'})
+    case = mongo.db.cases.find({'name':'iPhone 6s Screen Replacement'})
+    a = transcript[0]['content']['text']
+    b = case[0]['keywords']['identify']
+
+    aa = str(b).split(" ")
+
+    bb = str(a).split(" ")
+
+    print set(aa).intersection(bb)
+    return """hol"""
+
+#    for t in transcript:   
+#        print t['content']['text']
+#    for c in case:
+#        print c['keywords']['identify']
+#    return render_template('1.html', transcript=transcript)
+#        print result
+    
+@app.route('/summary')
+def summary():
+    return render_template('demo.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
 
 #to copy the ssh keys gcloud compute copy-files ~/.ssh/neem.json neemfs:~/.ssh/neem.json --zone asia-east1-a
 #mongo fast commenads / mongo / use app / db.users.find()
+

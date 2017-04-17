@@ -1,0 +1,401 @@
+
+{% extends "layout.html" %}
+{% block body %}
+
+	    <div class="main-panel">
+			<nav class="navbar navbar-default">
+	            <div class="container-fluid">
+					<div class="navbar-minimize">
+						<button id="minimizeSidebar" class="btn btn-fill btn-icon"><i class="ti-more-alt"></i></button>
+					</div>
+	                <div class="navbar-header">
+	                    <button type="button" class="navbar-toggle">
+	                        <span class="sr-only">Toggle navigation</span>
+	                        <span class="icon-bar bar1"></span>
+	                        <span class="icon-bar bar2"></span>
+	                        <span class="icon-bar bar3"></span>
+	                    </button>
+	                    <a class="navbar-brand" href="#regularforms">Regular Forms</a>
+	                </div>
+	                <div class="collapse navbar-collapse">
+						<form class="navbar-form navbar-left navbar-search-form" role="search">
+	    					<div class="input-group">
+	    						<span class="input-group-addon"><i class="fa fa-search"></i></span>
+	    						<input type="text" value="" class="form-control" placeholder="Search...">
+	    					</div>
+	    				</form>
+	                    <ul class="nav navbar-nav navbar-right">
+	                        <li>
+	                            <a href="#stats" class="dropdown-toggle btn-magnify" data-toggle="dropdown">
+	                                <i class="ti-panel"></i>
+									<p>Stats</p>
+	                            </a>
+	                        </li>
+	                        <li class="dropdown">
+	                            <a href="#notifications" class="dropdown-toggle btn-rotate" data-toggle="dropdown">
+	                                <i class="ti-bell"></i>
+	                                <span class="notification">5</span>
+									<p class="hidden-md hidden-lg">
+										Notifications
+										<b class="caret"></b>
+									</p>
+	                            </a>
+	                            <ul class="dropdown-menu">
+	                                <li><a href="#">Notification 1</a></li>
+	                                <li><a href="#">Notification 2</a></li>
+	                                <li><a href="#">Notification 3</a></li>
+	                                <li><a href="#">Notification 4</a></li>
+	                                <li><a href="#">Another notification</a></li>
+	                            </ul>
+	                        </li>
+							<li>
+	                            <a href="#settings" class="btn-rotate">
+									<i class="ti-settings"></i>
+									<p class="hidden-md hidden-lg">
+										Settings
+									</p>
+	                            </a>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </nav>
+
+	        <div class="content">
+	            <div class="container-fluid">
+	                <div class="row">
+<!--	                    
+	                    <div class="col-md-6">
+	                        <div class="card">
+							    <form method="#" action="#">
+		                            <div class="header">
+									    <h4 class="title">
+											Stacked Form
+										</h4>
+									</div>
+		                            <div class="content">
+	                                    <div class="form-group">
+	                                        <label>Email address</label>
+	                                        <input type="email" placeholder="Enter email" class="form-control">
+	                                    </div>
+	                                    <div class="form-group">
+	                                        <label>Password</label>
+	                                        <input type="password" placeholder="Password" class="form-control">
+	                                    </div>
+	                                    <div class="form-group">
+	                                        <label class="checkbox">
+	                                            <input type="checkbox" data-toggle="checkbox" value="" checked>
+	                                            Subscribe to newsletter
+	                                        </label>
+	                                    </div>
+	                                    <button type="submit" class="btn btn-fill btn-info">Submit</button>
+		                            </div>
+							    </form>
+	                        </div> 
+	                    </div> 
+
+	                    <div class="col-md-6">
+	                        <div class="card">
+								<form class="form-horizontal">
+		                            <div class="header">
+										<h4 class="title">
+											Horizontal Form
+										</h4>
+									</div>
+		                            <div class="content">
+										<div class="form-group">
+		                                    <label class="col-md-3 control-label">Email</label>
+		                                    <div class="col-md-9">
+		                                        <input type="email" placeholder="Email" class="form-control">
+		                                    </div>
+		                                </div>
+		                                <div class="form-group">
+		                                    <label class="col-md-3 control-label">Password</label>
+		                                    <div class="col-md-9">
+		                                        <input type="password" placeholder="Password" class="form-control">
+		                                    </div>
+		                                </div>
+		                                <div class="form-group">
+		                                    <label class="col-md-3"></label>
+		                                    <div class="col-md-9">
+		                                        <label class="checkbox">
+		                                            <input type="checkbox" data-toggle="checkbox" value="">
+		                                            Remember Me
+		                                        </label>
+		                                    </div>
+		                                </div>
+									</div>
+									<div class="card-footer">
+										<div class="form-group">
+											<label class="col-md-3"></label>
+											<div class="col-md-9">
+												<button type="submit" class="btn btn-fill btn-info">
+													Sign in
+												</button>
+											</div>
+										</div>
+									</div>
+								</form>
+	                    	</div> 
+	                	</div> 
+
+-->	                	
+	                    <div class="col-md-12">
+	                        <div class="card">
+	                            <div class="header">
+	                                
+	                                <!--<h4 class="title">Form Elements</h4>-->
+	                                 <legend>Identify Sale Case</legend>
+
+	                            </div>
+	                            <div class="content">
+	                                <form method="post" class="form-horizontal">
+
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Product Name</label>
+	                                            <div class="col-sm-5">
+	                        						<input type="text" value="For Example: iPhone 6 Screen Replacement" name="name" class="form-control"/>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Identify Product Keywords</label>
+	                                            <div class="col-sm-10">
+	                                                <input type="text" value="Example keywords: iphone, 6, screen, earpiece, 119, 89, guarantee" name="identify" class="form-control">
+	                                                <span class="help-block">Input keywords separated by commas.</span>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+<!--
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Password</label>
+	                                            <div class="col-sm-10">
+	                                                <input type="password" name="password" class="form-control">
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Placeholder</label>
+	                                            <div class="col-sm-10">
+	                                                <input type="text" placeholder="placeholder" class="form-control">
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Disabled</label>
+	                                            <div class="col-sm-10">
+	                                                <input type="text" placeholder="Disabled input here..." disabled="" class="form-control">
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Static control</label>
+	                                            <div class="col-sm-10">
+	                                                <p class="form-control-static">hello@creative-tim.com</p>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+										<fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Checkboxes and radios</label>
+	                                            <div class="col-sm-10">
+	                                                <label class="checkbox">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="">First Checkbox
+	                                                </label>
+
+	                                                <label class="checkbox">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="">Second Checkbox
+	                                                </label>
+
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadios" value="option1" checked="">First Radio
+	                                                </label>
+
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadios" value="option2">Second Radio
+	                                                </label>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                           <label class="col-sm-2 control-label">Inline checkboxes</label>
+	                                           <div class="col-sm-10">
+	                                                <label class="checkbox checkbox-inline">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="option1">a
+	                                                </label>
+	                                                <label class="checkbox checkbox-inline">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="option2">b
+	                                                </label>
+	                                                <label class="checkbox checkbox-inline">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="option3">c
+	                                                </label>
+	                                           </div>
+	                                        </div>
+	                                    </fieldset>
+-->
+										<fieldset>
+
+	                                       <legend>Sale case outcome </legend>
+
+	                                        <div class="form-group">
+	                                            
+	                                            <div class="col-sm-4 col-sm-offset-1">
+<!--	
+	                                                <label class="checkbox">
+	                                                    <input type="checkbox" data-toggle="checkbox" value="">
+	                                                    Unchecked
+	                                                </label>
+
+	                                                <label class="checkbox">
+	                                                    <input type="checkbox" data-toggle="checkbox" data-toggle="checkbox" value="" checked>
+	                                                    Checked
+	                                                </label>
+
+	                                                <label class="checkbox">
+	                                                    <input type="checkbox" data-toggle="checkbox" data-toggle="checkbox" value="" disabled>
+	                                                    Disabled unchecked
+	                                                </label>
+-->
+	                                                
+	                                            </div>
+<!--
+	                                            <div class="col-sm-5">
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadios2" value="">
+	                                                    Radio is off
+	                                                </label>
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadios2"value="" checked>
+	                                                    Radio is on
+	                                                </label>
+
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadiosDisabled2" value="" disabled>
+	                                                    Disabled radio is off
+	                                                </label>
+	                                                <label class="radio">
+	                                                    <input type="radio" data-toggle="radio" name="optionsRadiosDisabled2" value="" checked disabled>
+	                                                    Disabled radio is on
+	                                                </label>
+	                                            </div>
+-->	                                            
+	                                        </div>
+	                                    </fieldset>
+
+
+	                                    <fieldset>
+	                                        <div class="form-group has-success">
+	                                            <label class="col-sm-2 control-label">Success Indicator Keywords</label>
+	                                            <div class="col-sm-10">
+	                        						<input type="text" value="Successful sale example keywords: débito, crédito, direccion" name="successful" class="form-control"/>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group has-error">
+	                                            <label class="col-sm-2 control-label">Unavailable Product Keywords</label>
+	                                            <div class="col-sm-10">
+													<input type="text" value="Mistaken sale example keywords: samsung, galaxy, motorola" class="form-control" name="mistaken"/>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                           <label class="col-sm-2 control-label disabled">Configuation</label>
+	                                           <div class="col-sm-10">
+	                                                <label class="checkbox disabled checked checkbox-inline">
+	                                                    <input type="checkbox value disabled" data-toggle="checkbox" value="option1"> Spanish
+	                                                </label>
+	                                           </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+
+											<div class="col-md-12">
+												<button type="submit" class="btn btn-fill btn-info pull-right">
+													Create
+												</button>
+											</div>
+
+	                                    </fieldset>
+
+<!--
+	                                    <fieldset>
+	                                        <div class="form-group column-sizing">
+	                                            <label class="col-sm-2 control-label">Column sizing</label>
+	                                            <div class="col-sm-10">
+	                                                <div class="row">
+	                                                    <div class="col-md-3">
+	                                                        <input type="text" placeholder=".col-md-3" class="form-control">
+	                                                    </div>
+	                                                    <div class="col-md-4">
+	                                                        <input type="text" placeholder=".col-md-4" class="form-control">
+	                                                    </div>
+	                                                    <div class="col-md-5">
+	                                                        <input type="text" placeholder=".col-md-5" class="form-control">
+	                                                    </div>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+
+	                                    <fieldset>
+	                                        <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Input groups</label>
+	                                            <div class="col-sm-3">
+	                                                <div class="input-group">
+	                                                    <span class="input-group-addon">@</span>
+	                                                    <input type="text" placeholder="Username" class="form-control">
+	                                                </div>
+	                                            </div>
+	                                            <div class="col-sm-3">
+	                                                <div class="input-group">
+	                                                    <input type="text" class="form-control">
+	                                                    <span class="input-group-addon">.00</span>
+	                                                </div>
+	                                            </div>
+	                                            <div class="col-sm-4">
+	                                                <div class="input-group">
+	                                                    <span class="input-group-addon">$</span>
+	                                                    <input type="text" class="form-control">
+	                                                    <span class="input-group-addon">.00</span>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </fieldset>
+	                                    <fieldset>
+    	                                    <div class="form-group">
+	                                            <label class="col-sm-2 control-label">Textarea</label>
+	                                            <div class="col-sm-10">
+                                                    <textarea class="form-control" placeholder="Here can be your nice text" rows="3"></textarea>
+	                                            </div>
+    	                                    </div>
+	                                    </fieldset>
+	                                -->
+	                                </form>
+	                            </div>
+	                        </div>  
+	                    </div> 
+	                </div> 
+	            </div>
+
+
+
+{% endblock %}
