@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import os
 import sys
 reload(sys)
@@ -7,6 +8,7 @@ from flask import Flask, redirect, url_for, request, render_template, send_from_
 from flask_pymongo import PyMongo
 from werkzeug.utils import secure_filename
 from BeautifulSoup import BeautifulSoup
+from collections import Counter
 
 # for google speech pip install --upgrade google-cloud==0.24.0 --user, please note that the application is unstable if you use 0.25 or higher you should rewrite the application with the following examples https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/cloud-client/transcribe_async.py
 import time
@@ -74,7 +76,7 @@ def upload_file():
             client = speech.Client()
             hints = ['pantalla', 'iphone', '119', '69','bateria']
             sample = client.sample(content=None,source_uri=gs+filename,encoding='LINEAR16',sample_rate_hertz=8000)
-            operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=2, speech_contexts=hints)
+            operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=1, speech_contexts=hints)
             retry_count = 100
             while retry_count > 0 and not operation.complete:
                 retry_count -= 1
@@ -116,6 +118,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS    
 
+# This show the trasnscript for one given audio file
 @app.route('/transcripts/<filename>')
 def transcript(filename):
     transcript = mongo.db.transcripts.find({'filename':filename}) 
@@ -124,10 +127,6 @@ def transcript(filename):
 @app.route('/case/create', methods=['GET', 'POST'])
 def case():
     if request.method == 'POST':   
-       # save = mongo.db.cases.insert({'name':request.form['name'], 
-       #                 'keywords': {'identify': request.form['identify'], 'successful': request.form['successful'],  
-       #                 'mistaken': request.form['mistaken']}
-       #                 })
         save = mongo.db.cases.insert({'name':request.form.get('name'), 
                         'keywords': {'identify': request.form.get('identify'), 'successful': request.form.get('successful'),  
                         'mistaken': request.form.get('mistaken')}
@@ -136,30 +135,44 @@ def case():
         return """render_template('create_success.html', case=case)"""
     return render_template('create_case.html')
 
-@app.route('/sip')
-def sip():
-    transcript = mongo.db.transcripts.find({'filename':'56999975603_56999975603_12-04-2017_14-27-15.raw'})
-    case = mongo.db.cases.find({'name':'iPhone 6s Screen Replacement'})
-    a = transcript[0]['content']['text']
-    b = case[0]['keywords']['identify']
+# This show the trasnscript for one given audio file
+@app.route('/result/<filename>')
+def result(filename):
+    #before anything, groupby phone number
+    filename = '56999975603_56999975603_12-04-2017_14-27-15.raw'
+    telephone = filename[0:11]
+    #first, find the transcript in mongo
+    transcript = mongo.db.transcripts.find({'filename':filename})
+    #create a list of words for that transcript
+    transcript_content = transcript[0]['content']['text']
+    #separate each word with one space
+    transcript_content_ready = str(transcript_content).split(" ")
+    #secondly, iterate each case to verify which one fits the transcript better
+    case = mongo.db.cases.find()
+    for i in case:
+        case = str(i['name'])
+    # 1 - store the matching words from the transcript
+        keywords = str(i['keywords']['identify']).split(" ")
+        matching_keywords = Counter(set(keywords).intersection(transcript_content_ready)).keys()
+        count_matching_keywords = int(len(set(keywords).intersection(transcript_content_ready)))
+    # 2 - verify if the sale has been completed
+        successful_keywords = str(i['keywords']['successful']).split(" ")
+        successful_matching_keywords = Counter(set(successful_keywords).intersection(transcript_content_ready)).keys()
+        count_successful_matching_keywords =  int(len(set(successful_keywords).intersection(transcript_content_ready)))
+    # store these results on the transcript in the database
+        inserter = mongo.db.matches.save({'filename':filename, 'telephone': telephone, 'case': case, 'matching_keywords': matching_keywords,
+         'count_matching_keywords': count_matching_keywords, 'successful_keywords':successful_matching_keywords,
+         'count_successful_matching_keywords':count_successful_matching_keywords})
+    # Analize the results
+    match = mongo.db.matches.find({'telephone':telephone}, sort=[("count_matching_keywords", -1)]).limit(1)
+    # Store the sale case for that customer
+    identify_case = match[0]['case']
+    # Store sale case for that customer
+    case_keywords = match[0]['count_matching_keywords']
+    # Identify the if the sale was successful
+    success = mongo.db.matches.find({'telephone':telephone}, sort=[("count_successful_matching_keywords", -1)]).limit(1)
+    return render_template('result.html', transcript=transcript, match=match, success=success)
 
-    aa = str(b).split(" ")
-
-    bb = str(a).split(" ")
-
-    print set(aa).intersection(bb)
-    return """hol"""
-
-#    for t in transcript:   
-#        print t['content']['text']
-#    for c in case:
-#        print c['keywords']['identify']
-#    return render_template('1.html', transcript=transcript)
-#        print result
-    
-@app.route('/summary')
-def summary():
-    return render_template('demo.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
