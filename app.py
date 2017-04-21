@@ -251,8 +251,8 @@ if __name__ == "__main__":
 #to copy the ssh keys gcloud compute copy-files ~/.ssh/neem.json neemfs:~/.ssh/neem.json --zone asia-east1-a
 #mongo fast commenads / mongo / use app / db.users.find()
 
-    transcript_content = " "
-    for t in transcript:
-        line_content = str(t['content']['text'])
-        transcript_content = transcript_content + " " + line_content  
-        print transcript_content
+#    transcript_content = " "
+#    for t in transcript:
+#        line_content = str(t['content']['text'])
+#        transcript_content = transcript_content + " " + line_content  
+#        print transcript_content
