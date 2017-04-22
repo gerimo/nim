@@ -92,7 +92,7 @@ def upload_file():
             client = speech.Client()
             hints = ['pantalla', 'iphone', '119', '69','bateria']
             sample = client.sample(content=None,source_uri=gs+filename,encoding='LINEAR16',sample_rate_hertz=8000)
-            operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=0, speech_contexts=hints)
+            operation = sample.long_running_recognize(language_code='es-CL',max_alternatives=1, speech_contexts=hints)
             retry_count = 100
             while retry_count > 0 and not operation.complete:
                 retry_count -= 1
@@ -106,39 +106,9 @@ def upload_file():
                     print(alternative.confidence)
                     save = mongo.db.transcripts.insert({'filename':filename, 
                         'content': {'text':alternative.transcript, 'confidence':alternative.confidence,
-                        'verified':1}})
+                        'verified':0}})
                     transcript = mongo.db.transcripts.find({'filename':filename})
-                    telephone = filename[0:11]
-                    #create a list of words for that transcript
-                    transcript_content = transcript[0]['content']['text']
-                    #separate each word with one space
-                    transcript_content_ready = str(transcript_content).split(" ")
-                    #secondly, iterate each case to verify which one fits the transcript better
-                    case = mongo.db.cases.find()
-                    for i in case:
-                        case = str(i['name'])
-                    # 1 - store the matching words from the transcript
-                        keywords = str(i['keywords']['identify']).split(" ")
-                        matching_keywords = Counter(set(keywords).intersection(transcript_content_ready)).keys()
-                        count_matching_keywords = int(len(set(keywords).intersection(transcript_content_ready)))
-                    # 2 - verify if the sale has been completed
-                        successful_keywords = str(i['keywords']['successful']).split(" ")
-                        successful_matching_keywords = Counter(set(successful_keywords).intersection(transcript_content_ready)).keys()
-                        count_successful_matching_keywords =  int(len(set(successful_keywords).intersection(transcript_content_ready)))
-                    # store these results on the transcript in the database
-                        inserter = mongo.db.matches.save({'filename':filename, 'telephone': telephone, 'case': case, 'matching_keywords': matching_keywords,
-         'count_matching_keywords': count_matching_keywords, 'successful_keywords':successful_matching_keywords,
-         'count_successful_matching_keywords':count_successful_matching_keywords})
-                    # Analize the results
-                        match = mongo.db.matches.find({'telephone':telephone}, sort=[("count_matching_keywords", -1)]).limit(1)
-                    # Store the sale case for that customer
-                        identify_case = match[0]['case']
-                    # Store sale case for that customer
-                        case_keywords = match[0]['count_matching_keywords']
-                    # Identify the if the sale was successful
-                        success = mongo.db.matches.find({'telephone':telephone}, sort=[("count_successful_matching_keywords", -1)]).limit(1)
-                        return render_template('analysis.html', transcript=transcript, match=match, success=success)
-                    # show result, just as built on the result function down below.
+            return render_template('transcript.html',user=user, transcript=transcript) 
     return render_template('call_list.html', files=files)
             
 # retrieve the audio
@@ -205,18 +175,12 @@ def overlook():
 # This show the trasnscript for one given audio file
 @app.route('/analysis/<filename>')
 def analysis(filename):
-    filename = '56999975603_56999975603_12-04-2017_14-27-15.raw'
     #before anything, groupby phone number
     telephone = filename[0:11]
     #first, find the transcript in mongo
     transcript = mongo.db.transcripts.find({'filename':filename})
     #create a list of words for that transcript
     transcript_content = transcript[0]['content']['text']
-    #tttranscript_content = " "
-    #for t in transcript:
-    #    ttranscript_content = t['content']['text']
-    #    tttranscript_content += str(ttranscript_content)
-    #print tttranscript_content
     #separate each word with one space
     transcript_content_ready = str(transcript_content).split(" ")
     #secondly, iterate each case to verify which one fits the transcript better
