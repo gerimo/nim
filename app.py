@@ -210,7 +210,7 @@ def analysis(filename):
     return render_template('analysis.html', transcript=transcript, match=match, success=success)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
 
 #to copy the ssh keys gcloud compute copy-files ~/.ssh/neem.json neemfs:~/.ssh/neem.json --zone asia-east1-a
 #mongo fast commenads / mongo / use app / db.users.find()
