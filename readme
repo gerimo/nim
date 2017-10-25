@@ -1,0 +1,5 @@
+  Voice Recognition Software.
+  
+  Upload audio files, transcribe to text and analyze word frecuncy to identify sale cases.
+  
+  Uses Google Voice, Flask and MongoDB
